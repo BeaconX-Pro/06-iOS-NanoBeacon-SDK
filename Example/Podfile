@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'MKNanoBeacon_Example' do
+  pod 'MKNanoBeacon', :path => '../'
+
+  target 'MKNanoBeacon_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase'
+  end
+end
