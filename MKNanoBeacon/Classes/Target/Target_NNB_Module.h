@@ -1,5 +1,5 @@
 //
-//  Target_nnb_Module.h
+//  Target_NNB_Module.h
 //  MKNanoBeacon_Example
 //
 //  Created by aa on 2021/3/14.
@@ -12,10 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Target_nnb_Module : NSObject
+@interface Target_NNB_Module : NSObject
 
 /// 扫描页面
-- (UIViewController *)Action_nnb_Module_ScanController:(NSDictionary *)params;
+- (UIViewController *)Action_NNB_Module_ScanController:(NSDictionary *)params;
 
 @end
 
