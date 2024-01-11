@@ -1,0 +1,6 @@
+framework module MKNanoBeacon {
+  umbrella header "MKNanoBeacon-umbrella.h"
+
+  export *
+  module * { export * }
+}

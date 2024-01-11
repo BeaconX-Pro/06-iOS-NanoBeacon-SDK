@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MKNanoBeacon'
-  s.version          = '0.1.0'
+  s.version          = '0.0.1'
   s.summary          = 'A short description of MKNanoBeacon.'
 
 # This description is used to generate tags and improve search results.
@@ -28,15 +28,62 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/lovexiaoxia/MKNanoBeacon.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '10.0'
-
-  s.source_files = 'MKNanoBeacon/Classes/**/*'
+  s.ios.deployment_target = '14.0'
   
-  # s.resource_bundles = {
-  #   'MKNanoBeacon' => ['MKNanoBeacon/Assets/*.png']
-  # }
+  s.resource_bundles = {
+    'MKNanoBeacon' => ['MKNanoBeacon/Assets/*.png']
+  }
+  
+  s.subspec 'SDK' do |ss|
+    ss.source_files = 'MKNanoBeacon/Classes/SDK/**'
+    
+    ss.dependency 'MKBaseBleModule'
+  end
+  
+  s.subspec 'Target' do |ss|
+    ss.source_files = 'MKNanoBeacon/Classes/Target/**'
+    
+    ss.dependency 'MKNanoBeacon/Functions'
+  end
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.subspec 'Functions' do |ss|
+    
+    ss.subspec 'AboutPage' do |sss|
+      sss.subspec 'Controller' do |ssss|
+        ssss.source_files = 'MKNanoBeacon/Classes/Functions/AboutPage/Controller/**'
+      end
+    end
+    
+    ss.subspec 'ScanPage' do |sss|
+      sss.subspec 'Controller' do |ssss|
+        ssss.source_files = 'MKNanoBeacon/Classes/Functions/ScanPage/Controller/**'
+        
+        ssss.dependency 'MKNanoBeacon/Functions/ScanPage/Model'
+        ssss.dependency 'MKNanoBeacon/Functions/ScanPage/Adopter'
+        ssss.dependency 'MKNanoBeacon/Functions/ScanPage/View'
+      end
+      sss.subspec 'Model' do |ssss|
+        ssss.source_files = 'MKNanoBeacon/Classes/Functions/ScanPage/Model/**'
+      end
+      sss.subspec 'Adopter' do |ssss|
+        ssss.source_files = 'MKNanoBeacon/Classes/Functions/ScanPage/Adopter/**'
+        
+        ssss.dependency 'MKNanoBeacon/Functions/ScanPage/Model'
+      end
+      sss.subspec 'View' do |ssss|
+        ssss.source_files = 'MKNanoBeacon/Classes/Functions/ScanPage/View/**'
+      end
+    end
+    
+    ss.dependency 'MKNanoBeacon/SDK'
+    
+    ss.dependency 'MKBaseModuleLibrary'
+    ss.dependency 'MKCustomUIModule'
+    ss.dependency 'MKBeaconXCustomUI'
+    
+  end
+  
+  
+  
+  
 end
