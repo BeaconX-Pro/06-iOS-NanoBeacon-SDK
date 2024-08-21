@@ -61,6 +61,8 @@ TODO: Add long description of the pod here.
         ssss.dependency 'MKNanoBeacon/Functions/ScanPage/Model'
         ssss.dependency 'MKNanoBeacon/Functions/ScanPage/Adopter'
         ssss.dependency 'MKNanoBeacon/Functions/ScanPage/View'
+        
+        ssss.dependency 'MKNanoBeacon/Functions/AboutPage/Controller'
       end
       sss.subspec 'Model' do |ssss|
         ssss.source_files = 'MKNanoBeacon/Classes/Functions/ScanPage/Model/**'
