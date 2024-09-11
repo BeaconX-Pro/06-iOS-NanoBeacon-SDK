@@ -22,6 +22,13 @@
         return @[];
     }
     NSDictionary *advDic = advData[CBAdvertisementDataServiceDataKey];
+    NSData *manufacturerData = advData[CBAdvertisementDataManufacturerDataKey];
+    if ([[manufacturerData subdataWithRange:NSMakeRange(0, 2)] isEqualToData:[MKBLEBaseSDKAdopter stringToData:@"0505"]] && manufacturerData.length == 17) {
+        MKNNBNanoBeaconInfoBeacon *beacon = [[MKNNBNanoBeaconInfoBeacon alloc] initWithAdvertiseData:manufacturerData];
+        beacon.advertiseData = manufacturerData;
+        beacon.frameType = MKNNBNanoBeaconInfoFrameType;
+        return @[beacon];
+    }
     NSMutableArray *beaconList = [NSMutableArray array];
     NSArray *keys = [advDic allKeys];
     for (id key in keys) {
@@ -284,6 +291,56 @@
         
         self.battery = [MKBLEBaseSDKAdopter getDecimalStringWithHex:content range:NSMakeRange(32, 4)];
         self.tagID = [content substringFromIndex:36];
+    }
+    return self;
+}
+
+@end
+
+
+@implementation MKNNBNanoBeaconInfoBeacon
+
+- (MKNNBNanoBeaconInfoBeacon *)initWithAdvertiseData:(NSData *)advData {
+    if (self = [super init]) {
+        NSString *content = [MKBLEBaseSDKAdopter hexStringFromData:advData];
+        NSInteger index = 4;
+        self.trigger = [[content substringWithRange:NSMakeRange(index, 2)] isEqualToString:@"01"];
+        index += 2;
+        NSInteger tempVol = [MKBLEBaseSDKAdopter getDecimalWithHex:content range:NSMakeRange(index, 2)];
+        self.voltage = [NSString stringWithFormat:@"%ld", (long)(tempVol * 31.25)];
+        index += 2;
+        NSString *tempTemp1 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempTemp2 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempTemp = [tempTemp2 stringByAppendingString:tempTemp1];
+        NSInteger intTemp = [[MKBLEBaseSDKAdopter signedHexTurnString:tempTemp] integerValue];
+        self.temperature = [NSString stringWithFormat:@"%.1f", (intTemp * 0.01)];
+        
+        NSString *tempSecCnt1 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempSecCnt2 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempSecCnt3 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempSecCnt4 = [content substringWithRange:NSMakeRange(index, 2)];
+        index += 2;
+        NSString *tempSecCnt = [NSString stringWithFormat:@"%@%@%@%@",tempSecCnt4,tempSecCnt3,tempSecCnt2,tempSecCnt1];
+        self.secCnt = [MKBLEBaseSDKAdopter getDecimalStringWithHex:tempSecCnt range:NSMakeRange(0, tempSecCnt.length)];
+        NSString *tempStatus = [content substringWithRange:NSMakeRange(index, 2)];
+        NSString *binary = [MKBLEBaseSDKAdopter binaryByhex:tempStatus];
+        self.cutoffStatus = [[binary substringWithRange:NSMakeRange(2, 1)] integerValue];
+        self.btnAlarmStatus = [[binary substringWithRange:NSMakeRange(3, 1)] integerValue];
+        index += 2;
+        NSString *tempMac = [[content substringWithRange:NSMakeRange(index, 12)] uppercaseString];
+        NSString *macAddress = [NSString stringWithFormat:@"%@:%@:%@:%@:%@:%@",
+        [tempMac substringWithRange:NSMakeRange(10, 2)],
+        [tempMac substringWithRange:NSMakeRange(8, 2)],
+        [tempMac substringWithRange:NSMakeRange(6, 2)],
+        [tempMac substringWithRange:NSMakeRange(4, 2)],
+        [tempMac substringWithRange:NSMakeRange(2, 2)],
+        [tempMac substringWithRange:NSMakeRange(0, 2)]];
+        self.macAddress = macAddress;
     }
     return self;
 }

@@ -659,11 +659,13 @@ PODS:
     - MKBeaconXCustomUI
     - MKCustomUIModule
     - MKNanoBeacon/Functions/ScanPage/Model
+    - MKNanoBeacon/Functions/ScanPage/View
     - MKNanoBeacon/SDK
   - MKNanoBeacon/Functions/ScanPage/Controller (0.0.1):
     - MKBaseModuleLibrary
     - MKBeaconXCustomUI
     - MKCustomUIModule
+    - MKNanoBeacon/Functions/AboutPage/Controller
     - MKNanoBeacon/Functions/ScanPage/Adopter
     - MKNanoBeacon/Functions/ScanPage/Model
     - MKNanoBeacon/Functions/ScanPage/View
@@ -677,6 +679,7 @@ PODS:
     - MKBaseModuleLibrary
     - MKBeaconXCustomUI
     - MKCustomUIModule
+    - MKNanoBeacon/Functions/ScanPage/Model
     - MKNanoBeacon/SDK
   - MKNanoBeacon/SDK (0.0.1):
     - MKBaseBleModule
@@ -720,7 +723,7 @@ SPEC CHECKSUMS:
   MKBaseModuleLibrary: 2b79bcae588c755588413fbb643b510253271b23
   MKBeaconXCustomUI: 3cdea4a52442d432b2ebacd78460a890e7e644b6
   MKCustomUIModule: bbc862397ad4ffad0a88de756265a29aad5ddaab
-  MKNanoBeacon: 5330e3e926cf0a5fa60a1d6bb276232c9ad311d0
+  MKNanoBeacon: 03b465065229d047330a8e5cea53205030f3c72e
   MLInputDodger: 79a0e420a80d0d3bba122bf2639603cc76609ba8
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   Toast: ec33c32b8688982cecc6348adeae667c1b9938da

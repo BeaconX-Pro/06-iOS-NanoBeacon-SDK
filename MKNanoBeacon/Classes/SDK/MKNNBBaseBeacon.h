@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  - MKNNBURLFrameType: URL
  - MKNNBTLMFrameType: TLM
  - MKNNBSensorInfoFrameType: Sersor Info
+ - MKNNBNanoBeaconInfoFrameType:NanoBeacon info
  - MKNNBUnkonwFrameType: Unknown
  */
 typedef NS_ENUM(NSInteger, MKNNBDataFrameType) {
@@ -24,6 +25,7 @@ typedef NS_ENUM(NSInteger, MKNNBDataFrameType) {
     MKNNBURLFrameType,
     MKNNBTLMFrameType,
     MKNNBSensorInfoFrameType,
+    MKNNBNanoBeaconInfoFrameType,
     MKNNBUnknownFrameType,
 };
 
@@ -34,6 +36,8 @@ typedef NS_ENUM(NSInteger, MKNNBDataFrameType) {
  Frame type
  */
 @property (nonatomic, assign)MKNNBDataFrameType frameType;
+
+@property (nonatomic, copy)NSString *deviceName;
 /**
  rssi
  */
@@ -102,6 +106,29 @@ typedef NS_ENUM(NSInteger, MKNNBDataFrameType) {
 @property (nonatomic, copy) NSString *tagID;
 
 - (MKNNBSensorInfoBeacon *)initWithAdvertiseData:(NSData *)advData;
+
+@end
+
+@interface MKNNBNanoBeaconInfoBeacon : MKNNBBaseBeacon
+
+@property (nonatomic, assign)BOOL trigger;
+
+//Battery Voltage.Unit:V
+@property (nonatomic, copy) NSString *voltage;
+
+//Beacon Temperature
+@property (nonatomic, copy) NSString *temperature;
+
+//SEC CNT.
+@property (nonatomic, copy) NSString *secCnt;
+
+@property (nonatomic, assign) NSInteger btnAlarmStatus;
+
+@property (nonatomic, assign) NSInteger cutoffStatus;
+
+@property (nonatomic, copy)NSString *macAddress;
+
+- (MKNNBNanoBeaconInfoBeacon *)initWithAdvertiseData:(NSData *)advData;
 
 @end
 

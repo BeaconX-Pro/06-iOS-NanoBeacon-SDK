@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "summary": "A short description of MKNanoBeacon.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/lovexiaoxia/MKNanoBeacon",
+  "homepage": "https://github.com/BeaconX-Pro/06-iOS-NanoBeacon-SDK",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,7 +12,7 @@
     "lovexiaoxia": "aadyx2007@163.com"
   },
   "source": {
-    "git": "https://github.com/lovexiaoxia/MKNanoBeacon.git",
+    "git": "https://github.com/BeaconX-Pro/06-iOS-NanoBeacon-SDK.git",
     "tag": "0.0.1"
   },
   "platforms": {
@@ -83,6 +83,9 @@
                 ],
                 "MKNanoBeacon/Functions/ScanPage/View": [
 
+                ],
+                "MKNanoBeacon/Functions/AboutPage/Controller": [
+
                 ]
               }
             },
@@ -96,12 +99,20 @@
               "dependencies": {
                 "MKNanoBeacon/Functions/ScanPage/Model": [
 
+                ],
+                "MKNanoBeacon/Functions/ScanPage/View": [
+
                 ]
               }
             },
             {
               "name": "View",
-              "source_files": "MKNanoBeacon/Classes/Functions/ScanPage/View/**"
+              "source_files": "MKNanoBeacon/Classes/Functions/ScanPage/View/**",
+              "dependencies": {
+                "MKNanoBeacon/Functions/ScanPage/Model": [
+
+                ]
+              }
             }
           ]
         }

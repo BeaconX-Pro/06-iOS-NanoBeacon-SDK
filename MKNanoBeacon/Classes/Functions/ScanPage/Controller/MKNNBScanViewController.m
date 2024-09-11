@@ -285,6 +285,15 @@ mk_nnb_centralManagerScanDelegate>
         }
         return;
     }
+    if (beacon.frameType == MKNNBNanoBeaconInfoFrameType) {
+        //如果是NanoBeacon信息帧
+        MKNNBNanoBeaconInfoBeacon *tempBeacon = (MKNNBNanoBeaconInfoBeacon *)beacon;
+        if ([[tempBeacon.macAddress uppercaseString] containsString:[self.buttonModel.searchCondition uppercaseString]]) {
+            //如果mac地址和设备名称包含搜索条件，则加入
+            [self processBeacon:beacon];
+        }
+        return;
+    }
     //如果不是设备信息帧，则判断对应的有没有设备信息帧在当前数据源，如果没有直接舍弃，如果存在，则加入
     NSString *identy = beacon.peripheral.identifier.UUIDString;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"identifier == %@", identy];

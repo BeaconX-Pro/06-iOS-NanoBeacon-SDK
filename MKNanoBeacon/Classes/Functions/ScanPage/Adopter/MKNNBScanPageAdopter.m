@@ -23,6 +23,7 @@
 #import "MKNNBScanInfoCellModel.h"
 
 #import "MKScanSensorInfoCell.h"
+#import "MKNNBNanoBeaconInfoCell.h"
 
 #import "MKNNBBaseBeacon.h"
 
@@ -46,6 +47,7 @@ static const char *frameTypeKey = "frameTypeKey";
  MKNNBURLFrameType,
  MKNNBTLMFrameType,
  MKNNBSensorInfoFrameType,
+ MKNNBNanoBeaconInfoFrameType
  注意，MKNNBDeviceInfoFrameType为每个section的第一个row数据，不在此进行排列了
  */
 @property (nonatomic, assign)NSInteger frameIndex;
@@ -96,6 +98,16 @@ static const char *frameTypeKey = "frameTypeKey";
         cellModel.temperature = tempModel.temperature;
         return cellModel;
     }
+    if ([beacon isKindOfClass:MKNNBNanoBeaconInfoBeacon.class]) {
+        //NanoBeacon Info传感器
+        MKNNBNanoBeaconInfoBeacon *tempModel = (MKNNBNanoBeaconInfoBeacon *)beacon;
+        MKNNBNanoBeaconInfoCellModel *cellModel = [[MKNNBNanoBeaconInfoCellModel alloc] init];
+        cellModel.temperature = tempModel.temperature;
+        cellModel.runningTime = tempModel.secCnt;
+        cellModel.lastBtnStatus = tempModel.btnAlarmStatus;
+        cellModel.lastCutoffStatus = tempModel.cutoffStatus;
+        return cellModel;
+    }
     if ([beacon isKindOfClass:MKNNBTLMBeacon.class]) {
         //TLM
         MKNNBTLMBeacon *tempModel = (MKNNBTLMBeacon *)beacon;
@@ -137,11 +149,20 @@ static const char *frameTypeKey = "frameTypeKey";
     deviceModel.displayTime = @"N/A";
     deviceModel.lastScanDate = [[NSDate date] timeIntervalSince1970] * 1000;
     deviceModel.peripheral = beacon.peripheral;
+    if (ValidStr(beacon.deviceName)) {
+        deviceModel.deviceName = beacon.deviceName;
+    }
     if (beacon.frameType == MKNNBSensorInfoFrameType) {
         //如果是传感器信息帧
         MKNNBSensorInfoBeacon *tempInfoModel = (MKNNBSensorInfoBeacon *)beacon;
         deviceModel.tagID = tempInfoModel.tagID;
         deviceModel.battery = tempInfoModel.battery;
+    }
+    if (beacon.frameType == MKNNBNanoBeaconInfoFrameType) {
+        //如果是NanoBeacon信息帧
+        MKNNBNanoBeaconInfoBeacon *tempInfoModel = (MKNNBNanoBeaconInfoBeacon *)beacon;
+        deviceModel.macAddress = tempInfoModel.macAddress;
+        deviceModel.battery = tempInfoModel.voltage;
     }
     //如果是URL、TLM、UID、iBeacon、温湿度、三轴中的一种，直接加入到deviceModel中的数据帧数组里面
     NSObject *obj = [self parseBeaconDatas:beacon];
@@ -160,6 +181,9 @@ static const char *frameTypeKey = "frameTypeKey";
 + (void)updateInfoCellModel:(MKNNBScanInfoCellModel *)exsitModel beaconData:(MKNNBBaseBeacon *)beacon {
     exsitModel.peripheral = beacon.peripheral;
     exsitModel.rssi = [NSString stringWithFormat:@"%ld",(long)[beacon.rssi integerValue]];
+    if (ValidStr(beacon.deviceName)) {
+        exsitModel.deviceName = beacon.deviceName;
+    }
     if (exsitModel.lastScanDate > 0) {
         NSTimeInterval space = [[NSDate date] timeIntervalSince1970] * 1000 - exsitModel.lastScanDate;
         if (space > 10) {
@@ -174,6 +198,12 @@ static const char *frameTypeKey = "frameTypeKey";
         exsitModel.battery = tempInfoModel.battery;
         return;
     }
+    if (beacon.frameType == MKNNBNanoBeaconInfoFrameType) {
+        //如果是NanoBeacon信息帧
+        MKNNBNanoBeaconInfoBeacon *tempModel = (MKNNBNanoBeaconInfoBeacon *)beacon;
+        exsitModel.battery = tempModel.voltage;
+        exsitModel.macAddress = tempModel.macAddress;
+    }
     
     //如果是URL、TLM、UID、iBeacon、温湿度、三轴传感器中的一种，
     //如果eddStone帧数组里面已经包含该类型数据，则判断是否是TLM、温湿度、三轴传感器，如果是TLM、温湿度、三轴传感器直接替换数组中的数据，如果不是，则判断广播内容是否一样，如果一样，则不处理，如果不一样，直接加入到帧数组
@@ -185,6 +215,24 @@ static const char *frameTypeKey = "frameTypeKey";
     tempModel.advertiseData = beacon.advertiseData;
     tempModel.frameIndex = frameType;
     for (NSObject *model in exsitModel.advertiseList) {
+        if ([NSStringFromClass(tempModel.class) isEqualToString:NSStringFromClass(model.class)] &&
+            ([model isKindOfClass:MKNNBNanoBeaconInfoCellModel.class])) {
+            //NanoBeacon信息帧
+            MKNNBNanoBeaconInfoCellModel *tempCellModel = (MKNNBNanoBeaconInfoCellModel *)model;
+            MKNNBNanoBeaconInfoBeacon *tempModel = (MKNNBNanoBeaconInfoBeacon *)beacon;
+            
+            MKNNBNanoBeaconInfoCellModel *newModel = [[MKNNBNanoBeaconInfoCellModel alloc] init];
+            newModel.temperature = tempModel.temperature;
+            newModel.lastBtnStatus = tempModel.btnAlarmStatus;
+            newModel.lastCutoffStatus = tempModel.cutoffStatus;
+            newModel.cutOffTrigger = ((tempModel.cutoffStatus | tempCellModel.lastCutoffStatus) == 1);
+            newModel.buttonTrigger = ((tempModel.btnAlarmStatus & tempCellModel.lastBtnStatus) == 0);
+//            newModel.buttonTrigger = (tempModel.trigger && (tempModel.btnAlarmStatus == 1));
+            newModel.runningTime = tempModel.secCnt;
+            newModel.index = tempCellModel.index;
+            [exsitModel.advertiseList replaceObjectAtIndex:tempCellModel.index withObject:newModel];
+            return;
+        }
         if ([model.advertiseData isEqualToData:tempModel.advertiseData]) {
             //如果广播内容一样，直接舍弃数据
             return;
@@ -243,6 +291,12 @@ static const char *frameTypeKey = "frameTypeKey";
         cell.dataModel = dataModel;
         return cell;
     }
+    if ([dataModel isKindOfClass:MKNNBNanoBeaconInfoCellModel.class]){
+        //NanoBeacon Info
+        MKNNBNanoBeaconInfoCell *cell = [MKNNBNanoBeaconInfoCell initCellWithTableView:tableView];
+        cell.dataModel = dataModel;
+        return cell;
+    }
     
     return [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"MKBXScanPageAdopterIdenty"];
 }
@@ -263,6 +317,10 @@ static const char *frameTypeKey = "frameTypeKey";
     if ([dataModel isKindOfClass:MKScanSensorInfoCellModel.class]){
         //Sensor
         return 60.f;
+    }
+    if ([dataModel isKindOfClass:MKNNBNanoBeaconInfoCellModel.class]){
+        //Sensor
+        return 150.f;
     }
     
     return 0;
@@ -294,8 +352,12 @@ static const char *frameTypeKey = "frameTypeKey";
         //Sensor
         return 3;
     }
+    if ([dataModel isKindOfClass:NSClassFromString(@"MKNNBNanoBeaconInfoCellModel")]) {
+        //NanoBeacon Info
+        return 4;
+    }
     
-    return 4;
+    return 5;
 }
 
 @end

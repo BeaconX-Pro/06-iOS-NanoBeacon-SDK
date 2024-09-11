@@ -14,6 +14,7 @@
 #import "MKNNBScanPageAdopter.h"
 #import "MKNNBScanViewController.h"
 #import "MKNNBScanInfoCellModel.h"
+#import "MKNNBNanoBeaconInfoCell.h"
 #import "MKNNBScanFilterView.h"
 #import "MKNNBScanInfoCell.h"
 #import "MKNNBScanSearchButton.h"

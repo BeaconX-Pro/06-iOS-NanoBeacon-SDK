@@ -71,14 +71,18 @@ static dispatch_once_t onceToken;
 - (void)MKBLEBaseCentralManagerDiscoverPeripheral:(CBPeripheral *)peripheral
                                 advertisementData:(NSDictionary<NSString *,id> *)advertisementData
                                              RSSI:(NSNumber *)RSSI {
-    NSLog(@"%@",advertisementData);
+//    NSLog(@"%@",advertisementData);
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSArray *beaconList = [MKNNBBaseBeacon parseAdvData:advertisementData];
+        if (!MKValidArray(beaconList)) {
+            return;
+        }
         for (NSInteger i = 0; i < beaconList.count; i ++) {
             MKNNBBaseBeacon *beaconModel = beaconList[i];
             beaconModel.identifier = peripheral.identifier.UUIDString;
             beaconModel.rssi = RSSI;
             beaconModel.peripheral = peripheral;
+            beaconModel.deviceName = advertisementData[CBAdvertisementDataLocalNameKey];
         }
         if ([self.delegate respondsToSelector:@selector(mk_nnb_receiveBeacon:)]) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -140,8 +144,7 @@ static dispatch_once_t onceToken;
 }
 
 - (void)startScan {
-    [[MKBLEBaseCentralManager shared] scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:@"FEAA"],
-                                                                       [CBUUID UUIDWithString:@"EA01"]]
+    [[MKBLEBaseCentralManager shared] scanForPeripheralsWithServices:@[]
                                                              options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@(YES)}];
 }
 

@@ -44,6 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
 //Battery Voltage
 @property (nonatomic, copy) NSString *battery;
 
+@property (nonatomic, copy)NSString *macAddress;
+
+@property (nonatomic, copy)NSString *deviceName;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -41,6 +41,8 @@ static CGFloat const batteryIconHeight = 25.f;
 
 @property (nonatomic, strong)UILabel *batteryLabel;
 
+@property (nonatomic, strong)UILabel *deviceNameLabel;
+
 /**
  mac地址
  */
@@ -77,12 +79,13 @@ static CGFloat const batteryIconHeight = 25.f;
         
         [self.topBackView addSubview:self.rssiIcon];
         [self.topBackView addSubview:self.rssiLabel];
-        [self.topBackView addSubview:self.macLabel];
+        [self.topBackView addSubview:self.deviceNameLabel];
         
         [self.centerBackView addSubview:self.batteryIcon];
-        [self.centerBackView addSubview:self.tagIDLabel];
+        [self.centerBackView addSubview:self.macLabel];
         
         [self.bottomBackView addSubview:self.batteryLabel];
+        [self.bottomBackView addSubview:self.tagIDLabel];
         [self.bottomBackView addSubview:self.timeLabel];
         
         [self.layer setMasksToBounds:YES];
@@ -112,7 +115,7 @@ static CGFloat const batteryIconHeight = 25.f;
         make.top.mas_equalTo(self.rssiIcon.mas_bottom).mas_offset(5.f);
         make.height.mas_equalTo(MKFont(10.f).lineHeight);
     }];
-    [self.macLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+    [self.deviceNameLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.rssiIcon.mas_right).mas_offset(20.f);
         make.centerY.mas_equalTo(self.rssiIcon.mas_centerY);
         make.right.mas_equalTo(-15.f);
@@ -131,8 +134,8 @@ static CGFloat const batteryIconHeight = 25.f;
         make.centerY.mas_equalTo(self.centerBackView.mas_centerY);
         make.height.mas_equalTo(batteryIconHeight);
     }];
-    [self.tagIDLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(self.macLabel.mas_left);
+    [self.macLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.deviceNameLabel.mas_left);
         make.right.mas_equalTo(self.timeLabel.mas_left).mas_offset(-5.f);
         make.centerY.mas_equalTo(self.centerBackView.mas_centerY);
         make.height.mas_equalTo(MKFont(13.f).lineHeight);
@@ -150,6 +153,12 @@ static CGFloat const batteryIconHeight = 25.f;
         make.top.mas_equalTo(3.f);
         make.height.mas_equalTo(MKFont(15.f).lineHeight);
     }];
+    [self.tagIDLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.macLabel.mas_left);
+        make.right.mas_equalTo(self.timeLabel.mas_left).mas_offset(-10.f);
+        make.centerY.mas_equalTo(self.batteryLabel.mas_centerY);
+        make.height.mas_equalTo(MKFont(13.f).lineHeight);
+    }];
     [self.timeLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(-15.f);
         make.width.mas_equalTo(70.f);
@@ -165,10 +174,11 @@ static CGFloat const batteryIconHeight = 25.f;
     if (!_dataModel || ![_dataModel isKindOfClass:MKNNBScanInfoCellModel.class]) {
         return;
     }
-    
+    self.deviceNameLabel.text = (ValidStr(_dataModel.deviceName) ? _dataModel.deviceName : @"N/A");
     self.timeLabel.text = _dataModel.displayTime;
     self.rssiLabel.text = [SafeStr(_dataModel.rssi) stringByAppendingString:@"dBm"];
-    self.macLabel.text = @"N/A";
+    NSString *mac = (ValidStr(_dataModel.macAddress) ? _dataModel.macAddress : @"N/A");
+    self.macLabel.text = [@"MAC: " stringByAppendingString:mac];
     self.batteryLabel.text = (ValidStr(_dataModel.battery) ? [_dataModel.battery stringByAppendingString:@"mV"] : @"N/A");
     NSString *tagID = (ValidStr(_dataModel.tagID) ? _dataModel.tagID : @"N/A");
     self.tagIDLabel.text = [NSString stringWithFormat:@"Tag ID:%@",tagID];
@@ -208,9 +218,17 @@ static CGFloat const batteryIconHeight = 25.f;
     return _batteryLabel;
 }
 
+- (UILabel *)deviceNameLabel{
+    if (!_deviceNameLabel) {
+        _deviceNameLabel = [self createLabelWithFont:MKFont(15)];
+        _deviceNameLabel.textColor = DEFAULT_TEXT_COLOR;
+    }
+    return _deviceNameLabel;
+}
+
 - (UILabel *)macLabel{
     if (!_macLabel) {
-        _macLabel = [self createLabelWithFont:MKFont(15)];
+        _macLabel = [self createLabelWithFont:MKFont(13)];
     }
     return _macLabel;
 }
